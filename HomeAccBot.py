@@ -7,7 +7,7 @@ from telegram.ext import Updater, CommandHandler, CallbackContext, MessageHandle
 
 RANDOM_DOGO_API = 'https://random.dog/woof.json'
 HOME_ACC_POST_EXPENSE_API = 'http://localhost/Home/hs/HomeAcc/exp/postexpense'
-HOME_ACC_POST_INCOME_API = 'http://localhost/Home/hs/HomeAcc/exp/postincome'
+HOME_ACC_POST_INCOME_API = 'http://localhost/Home/hs/HomeAcc/inc/postincome'
 HOME_ACC_POST_TRANSFER_API = 'http://localhost/Home/hs/HomeAcc/trn/posttransfer'
 
 
@@ -114,7 +114,7 @@ def main(args):
     dp.add_handler(CommandHandler('help', help))
     dp.add_handler(MessageHandler(Filters.regex('[Рр]{1}асход ([а-яА-Я]+) ([а-яА-Я0-9]+) ([\d]+)'), expense))
     dp.add_handler(MessageHandler(Filters.regex('[Пп]{1}еремещение ([а-яА-Я0-9]+) ([а-яА-Я0-9]+) ([\d]+)'), transfer))
-    dp.add_handler(MessageHandler(Filters.regex('[Дд]{1}одод ([а-яА-Я0-9]+) ([а-яА-Я0-9]+) ([\d]+)'), income))
+    dp.add_handler(MessageHandler(Filters.regex('[Дд]{1}оход ([а-яА-Я0-9]+) ([а-яА-Я0-9]+) ([\d]+)'), income))
     updater.start_polling()
     updater.idle()
 
