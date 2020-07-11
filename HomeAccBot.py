@@ -7,6 +7,7 @@ from telegram.ext import Updater, CommandHandler, CallbackContext, MessageHandle
 
 RANDOM_DOGO_API = 'https://random.dog/woof.json'
 HOME_ACC_POST_EXPENSE_API = 'http://localhost/Home/hs/HomeAcc/exp/postexpense'
+HOME_ACC_POST_INCOME_API = 'http://localhost/Home/hs/HomeAcc/exp/postincome'
 HOME_ACC_POST_TRANSFER_API = 'http://localhost/Home/hs/HomeAcc/trn/posttransfer'
 
 
@@ -33,12 +34,13 @@ def help(update: Update, context: CallbackContext):
     context.bot.send_message(chat_id=update.message.chat_id,
                              text=f'Регистрация расхода: расход питание карта1 150\n'
                                   'Регистрация перемещения средств: перемещение карта1 карта2 150\n'
+                                  'Регистрация дохода: доход зп карта1 150000\n'
                                   'Собакен: /dogo /help'
                              )
 
 
 def expense(update: Update, context: CallbackContext):
-    print(context.match.groups())
+    # print(context.match.groups())
     data_to_post = {
         'id': f'{update.message.chat.id}-{update.message.message_id}',
         'expense': context.match.groups()[0],
@@ -55,8 +57,26 @@ def expense(update: Update, context: CallbackContext):
                              reply_to_message_id=update.message.message_id)
 
 
+def income(update: Update, context: CallbackContext):
+    # print(context.match.groups())
+    data_to_post = {
+        'id': f'{update.message.chat.id}-{update.message.message_id}',
+        'income': context.match.groups()[0],
+        'wallet': context.match.groups()[1],
+        'sum': context.match.groups()[2],
+        'date': update.message.date
+    }
+    response = requests.post(HOME_ACC_POST_INCOME_API,
+                             data=json.dumps(data_to_post, sort_keys=True, indent=1, default=default),
+                             headers={"Content-Type": "application/json"})
+
+    context.bot.send_message(chat_id=update.message.chat_id,
+                             text=f'{response.text} ({response.status_code}) /help',
+                             reply_to_message_id=update.message.message_id)
+
+
 def transfer(update: Update, context: CallbackContext):
-    print(context.match.groups())
+    # print(context.match.groups())
     data_to_post = {
         'id': f'{update.message.chat.id}-{update.message.message_id}',
         'wallet1': context.match.groups()[0],
@@ -94,6 +114,7 @@ def main(args):
     dp.add_handler(CommandHandler('help', help))
     dp.add_handler(MessageHandler(Filters.regex('[Рр]{1}асход ([а-яА-Я]+) ([а-яА-Я0-9]+) ([\d]+)'), expense))
     dp.add_handler(MessageHandler(Filters.regex('[Пп]{1}еремещение ([а-яА-Я0-9]+) ([а-яА-Я0-9]+) ([\d]+)'), transfer))
+    dp.add_handler(MessageHandler(Filters.regex('[Дд]{1}одод ([а-яА-Я0-9]+) ([а-яА-Я0-9]+) ([\d]+)'), income))
     updater.start_polling()
     updater.idle()
 
